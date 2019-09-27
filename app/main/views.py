@@ -6,7 +6,7 @@ from ..models import Pitch, User,Comment,Upvote,Downvote
 from .forms import PitchForm, CommentForm, UpvoteForm
 from flask.views import View,MethodView
 from .. import db
-import markdown2
+import markdown2 
 
 
 # Views
@@ -90,11 +90,6 @@ def upvote(pitch_id):
 
 
 
-#    new_upvote = Upvote(user=current_user, pitch=pitch, vote_number=1)
-#    new_vote.save_vote()
-# return redirect(url_for('main.index'))
-
-
 @main.route('/pitch/downvote/<int:pitch_id>/downvote', methods = ['GET', 'POST'])
 @login_required
 def downvote(pitch_id):
@@ -109,3 +104,12 @@ def downvote(pitch_id):
     new_downvote = Downvote(pitch_id=pitch_id, user = current_user)
     new_downvote.save_downvotes()
     return redirect(url_for('main.index'))
+
+
+@main.route('/review/<int:id>')
+def single_review(id):
+    review=Review.query.get(id)
+    if review is None:
+        abort(404)
+    format_review = markdown2.markdown(review.movie_review,extras=["code-friendly", "fenced-code-blocks"])
+    return render_template('review.html',review = review,format_review=format_review)
